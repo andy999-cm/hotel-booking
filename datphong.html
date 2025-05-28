@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Đặt Phòng Khách Sạn</title>
+  <style>
+    body { font-family: Arial; margin: 30px; }
+    .section { margin-bottom: 25px; }
+    .section label { display: block; margin-bottom: 5px; font-weight: bold; }
+    .section input, select { width: 100%; padding: 8px; margin-bottom: 10px; }
+    .room-option input { margin-right: 10px; }
+    .payment-info { display: none; }
+    .total { font-weight: bold; font-size: 18px; margin-top: 10px; }
+    button { padding: 10px 20px; background-color: brown; color: white; border: none; cursor: pointer; }
+    h3, h4 { margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <h2>Đặt phòng khách sạn</h2>
+
+  <div class="section">
+    <label>Họ và tên</label>
+    <input type="text" id="name" required>
+
+    <label>Email</label>
+    <input type="email" id="email" required>
+
+    <label>Số điện thoại</label>
+    <input type="tel" id="phone" required>
+  </div>
+
+  <div class="section">
+    <label>Ngày nhận phòng</label>
+    <input type="date" id="checkin" required>
+
+    <label>Ngày trả phòng</label>
+    <input type="date" id="checkout" required>
+  </div>
+
+  <div class="section">
+    <label>Chọn loại phòng:</label>
+    <div class="room-option">
+      <input type="radio" name="room" value="3400000" id="premier" checked>
+      <label for="premier">Phòng Premier – 3.400.000 ₫</label>
+    </div>
+    <div class="room-option">
+      <input type="radio" name="room" value="3769200" id="deluxe">
+      <label for="deluxe">Phòng Deluxe có ban công – 3.769.200 ₫</label>
+    </div>
+    <div class="room-option">
+      <input type="radio" name="room" value="4399200" id="residence">
+      <label for="residence">Residence Club – 4.399.200 ₫</label>
+    </div>
+    <div class="room-option">
+      <input type="radio" name="room" value="7369200" id="suite">
+      <label for="suite">Phòng Suite – 7.369.200 ₫</label>
+    </div>
+    <div class="room-option">
+      <input type="radio" name="room" value="25920000" id="director">
+      <label for="director">Director's Suite – 25.920.000 ₫</label>
+    </div>
+  </div>
+
+  <div class="section">
+    <label>Phương thức thanh toán</label>
+    <select id="paymentMethod" onchange="showPaymentFields()">
+      <option value="">-- Chọn phương thức --</option>
+      <option value="momo">Ví Momo</option>
+      <option value="atm">Thẻ ATM nội địa</option>
+      <option value="visa">Thẻ VISA / Mastercard</option>
+    </select>
+  </div>
+
+  <div id="momoFields" class="payment-info">
+    <label>Mã OTP (gửi về Momo):</label>
+    <input type="text" placeholder="Nhập mã OTP">
+  </div>
+
+  <div id="cardFields" class="payment-info">
+    <label>Số thẻ</label>
+    <input type="text" placeholder="xxxx xxxx xxxx xxxx">
+
+    <label>Họ tên chủ thẻ</label>
+    <input type="text" placeholder="Nguyễn Văn A">
+
+    <label>Ngày hết hạn</label>
+    <input type="month">
+
+    <label>Mã CVV</label>
+    <input type="text" placeholder="***">
+  </div>
+
+  <div class="section total" id="totalSection" style="display:none;">
+    Tổng cộng: <span id="totalPrice">0</span> ₫ (đã gồm thuế và phí)
+  </div>
+
+  <button onclick="submitBooking()">Xác nhận đặt phòng</button>
+
+  <!-- CHÍNH SÁCH -->
+  <div class="section">
+    <h3>Chính sách</h3>
+    <p><strong>Đăng ký vào:</strong> sau 2:00 chiều</p>
+    <p><strong>Trả phòng:</strong> trước 12:00 trưa</p>
+    <p><strong>Phòng:</strong> Lựa chọn theo loại khách chọn</p>
+
+    <h4>Chính sách bảo hành</h4>
+    <p>
+      Đặt phòng phải được đảm bảo bằng thẻ tín dụng tại thời điểm đặt phòng. Khách sạn sẽ lấy một khoản tiền ủy quyền trước từ thẻ tín dụng của bạn với số tiền bằng giá phòng đêm đầu tiên của bạn. Phòng sẽ được giữ cho đến 12 giờ đêm vào ngày đến (giờ địa phương của khách sạn).
+    </p>
+
+    <h4>Chính sách hủy bỏ</h4>
+    <p>
+      Việc hủy đặt phòng phải được thực hiện trước 24 giờ so với giờ đến (giờ địa phương của khách sạn) để tránh phải trả phí phòng một đêm cộng thêm phụ phí.
+    </p>
+  </div>
+
+  <script>
+    const rooms = {
+      premier: { name: "Phòng Premier", price: 3400000 },
+      deluxe: { name: "Phòng Deluxe có ban công", price: 3769200 },
+      residence: { name: "Residence Club", price: 4399200 },
+      suite: { name: "Phòng Suite", price: 7369200 },
+      director: { name: "Director's Suite", price: 25920000 }
+    };
+
+    function showPaymentFields() {
+      const method = document.getElementById("paymentMethod").value;
+      document.getElementById("momoFields").style.display = method === "momo" ? "block" : "none";
+      document.getElementById("cardFields").style.display = (method === "atm" || method === "visa") ? "block" : "none";
+    }
+
+    function submitBooking() {
+      const selected = document.querySelector('input[name="room"]:checked');
+      const room = rooms[selected.id];
+      const tax = Math.round(room.price * 0.15);
+      const total = room.price + tax;
+
+      document.getElementById("totalPrice").innerText = total.toLocaleString();
+      document.getElementById("totalSection").style.display = "block";
+
+      alert(
+        "Đặt phòng thành công!\n" +
+        "Loại phòng: " + room.name + "\n" +
+        "Tổng cộng: " + total.toLocaleString() + " ₫"
+      );
+    }
+  </script>
+
+</body>
+</html>
